@@ -11,7 +11,7 @@ const ExploreScreen = () => {
     { id: 6, name: 'Üniversite', active: false },
     { id: 7, name: 'Park', active: false },
     { id: 8, name: 'Sinema', active: false },
-    { id: 9, name: 'Spor Salonu', active: true },
+    { id: 9, name: 'Spor Salonu', active: false },
     { id: 10, name: 'Kütüphane', active: false },
   ]);
 

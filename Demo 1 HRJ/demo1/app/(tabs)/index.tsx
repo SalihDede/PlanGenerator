@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router'; // useRouter importu
 
 const HitTheRoadScreen = () => {
-  const [start, setStart] = useState('');
-  const [destination, setDestination] = useState('');
+  const [start, setStart] = React.useState('');
+  const [destination, setDestination] = React.useState('');
+  const router = useRouter(); // useRouter kancasını al
+
+  const handleFilterPlan = () => {
+    router.push('/explore'); // Explore ekranına yönlendir
+  };
 
   return (
     <View style={styles.container}>
@@ -22,7 +28,7 @@ const HitTheRoadScreen = () => {
         onChangeText={setDestination}
         placeholderTextColor="#ccc"
       />
-      <Button title="FILTER PLAN" onPress={() => {}} color="#007bff" />
+      <Button title="FILTER PLAN" onPress={handleFilterPlan} color="#007bff" />
     </View>
   );
 };
