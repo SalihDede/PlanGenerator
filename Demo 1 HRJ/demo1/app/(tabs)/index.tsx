@@ -1,34 +1,48 @@
-import React from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
+import AutoCompleteInput from './AutoCompleteInput'; // Make sure the path is correct
 import { useRouter } from 'expo-router'; // useRouter importu
 
 const HitTheRoadScreen = () => {
-  const [start, setStart] = React.useState('');
-  const [destination, setDestination] = React.useState('');
+  const [startLocation, setStartLocation] = useState<any | null>(null);
+  const [destinationLocation, setDestinationLocation] = useState<any | null>(null);
   const router = useRouter(); // useRouter kancasını al
 
+  const handleStartLocationSelect = (location: any) => {
+    console.log('Seçilen Başlangıç Konumu:', location);
+    setStartLocation(location);
+  };
+
+  const handleDestinationLocationSelect = (location: any) => {
+    console.log('Seçilen Varış Konumu:', location);
+    setDestinationLocation(location);
+  };
+
   const handleFilterPlan = () => {
-    router.push('/explore'); // Explore ekranına yönlendir
+    console.log('Başlangıç Latitude:', startLocation?.geometry?.location?.lat); // Kontrol et
+    console.log('Başlangıç Longitude:', startLocation?.geometry?.location?.lng); // Kontrol et
+    console.log('Varış Latitude:', destinationLocation?.geometry?.location?.lat); // Kontrol et
+    console.log('Varış Longitude:', destinationLocation?.geometry?.location?.lng); // Kontrol et
+
+    router.push('/map');
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hit The Road</Text>
-      <TextInput
-        style={styles.input}
+      <AutoCompleteInput
+        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M" // Replace with your API key
+        onSelectLocation={handleStartLocationSelect}
         placeholder="Başlangıç"
-        value={start}
-        onChangeText={setStart}
-        placeholderTextColor="#ccc"
       />
-      <TextInput
-        style={styles.input}
+      <AutoCompleteInput
+        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M" // Replace with your API key
+        onSelectLocation={handleDestinationLocationSelect}
         placeholder="Varış"
-        value={destination}
-        onChangeText={setDestination}
-        placeholderTextColor="#ccc"
       />
-      <Button title="FILTER PLAN" onPress={handleFilterPlan} color="#007bff" />
+      <View style={styles.buttonContainer}>
+        <Button title="FILTER PLAN" onPress={handleFilterPlan} color="#007bff" />
+      </View>
     </View>
   );
 };
@@ -47,13 +61,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 30,
   },
-  input: {
+  buttonContainer: {
     width: '100%',
-    height: 50,
-    backgroundColor: '#fff',
     borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
+    marginTop: 20,
   },
 });
 

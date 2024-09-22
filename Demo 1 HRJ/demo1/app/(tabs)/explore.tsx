@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router'; // Import useRouter for routing
 
 const ExploreScreen = () => {
   const [options, setOptions] = useState([
@@ -15,10 +16,16 @@ const ExploreScreen = () => {
     { id: 10, name: 'Kütüphane', active: false },
   ]);
 
+  const router = useRouter(); // useRouter for navigation
+
   const toggleOption = (id: number) => {
     setOptions(options.map(option =>
       option.id === id ? { ...option, active: !option.active } : option
     ));
+  };
+
+  const handleGenerateMap = () => {
+    router.push('/map'); // Navigate to the map screen when "GENERATE MAP" is clicked
   };
 
   return (
@@ -36,7 +43,7 @@ const ExploreScreen = () => {
           </TouchableOpacity>
         </View>
       ))}
-      <TouchableOpacity style={styles.generateButton}>
+      <TouchableOpacity style={styles.generateButton} onPress={handleGenerateMap}>
         <Text style={styles.generateButtonText}>GENERATE MAP</Text>
       </TouchableOpacity>
     </View>
