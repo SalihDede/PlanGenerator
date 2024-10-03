@@ -1,19 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
-// Google Places API Key
 const API_KEY = 'AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M'; // Replace with your actual API key
 
 const FindBusiness = ({ circles, onBusinessesFound }: { circles: Array<{ latitude: number, longitude: number, radius: number }>, onBusinessesFound: (businesses: any[]) => void }) => {
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]); // State to store selected options
 
   useEffect(() => {
-    if (circles.length > 0) {
+    // Fetch selected options from AsyncStorage
+    const fetchSelectedOptions = async () => {
+      const optionsString = await AsyncStorage.getItem('selectedOptions');
+      if (optionsString) {
+        const options = JSON.parse(optionsString);
+        setSelectedOptions(options);
+      }
+    };
+
+    fetchSelectedOptions();
+  }, []);
+
+  useEffect(() => {
+    if (circles.length > 0 && selectedOptions.length > 0) { // Wait for options to load
       setLoading(true);
       fetchBusinesses();
     }
-  }, [circles]);
+  }, [circles, selectedOptions]);
+
+  // Map selected options to Google Places types
+const optionToTypeMap: { [key: string]: string[] } = {
+  'Café': ['cafe'],
+  'Food': ['restaurant', 'bakery', 'meal_takeaway'],
+  'Bar': ['bar', 'night_club'],
+  'Hotel': ['hotel', 'lodging'],
+  'Museum': ['museum'],
+  'Park': ['park'],
+  'University': ['university'],
+  'Library': ['library'],
+  'Gym': ['gym', 'fitness_center'],
+  'Cinema': ['movie_theater'],
+  'Shopping Mall': ['shopping_mall'],
+  'Pharmacy': ['pharmacy'],
+  'Gas Station': ['gas_station'],
+  'Supermarket': ['grocery_or_supermarket'],
+  'Hospital': ['hospital'],
+  'Bank': ['bank', 'atm'],
+  'Church': ['church', 'place_of_worship'],
+  'Police': ['police'],
+  'Post Office': ['post_office'],
+  'Zoo': ['zoo'],
+};
 
   const fetchBusinesses = async () => {
     let allBusinesses: any[] = [];
@@ -39,12 +77,27 @@ const FindBusiness = ({ circles, onBusinessesFound }: { circles: Array<{ latitud
         return acc;
       }, []);
 
-      // Select 5 random businesses
-      const shuffledBusinesses = uniqueBusinesses.sort(() => 0.5 - Math.random());
-      const randomBusinesses = shuffledBusinesses.slice(0, 5); // Get 5 random businesses
+      // Filter businesses by selected options and their respective types
+      let filteredBusinesses: any[] = [];
 
-      setBusinesses(randomBusinesses);
-      onBusinessesFound(randomBusinesses); // Pass the found businesses to the parent
+      selectedOptions.forEach(option => {
+        const typesForOption = optionToTypeMap[option] || [];
+        
+        // Filter businesses that match any of the types for this option
+        const optionBusinesses = uniqueBusinesses.filter((business: any) => 
+          business.types.some((type: string) => typesForOption.includes(type.toLowerCase()))
+        );
+
+        // Select 3 random businesses for this option
+        const shuffledBusinesses = optionBusinesses.sort(() => 0.5 - Math.random());
+        const selectedForOption = shuffledBusinesses.slice(0, 3); // Get 3 businesses for this option
+
+        // Add the selected businesses for this option to the final list
+        filteredBusinesses = [...filteredBusinesses, ...selectedForOption];
+      });
+
+      setBusinesses(filteredBusinesses);
+      onBusinessesFound(filteredBusinesses); // Pass the found businesses to the parent
     } catch (error) {
       console.error('Error fetching businesses:', error);
     } finally {
@@ -54,7 +107,7 @@ const FindBusiness = ({ circles, onBusinessesFound }: { circles: Array<{ latitud
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Random 5 Businesses Inside Circles</Text>
+      <Text style={styles.title}>Selected Businesses for Each Option</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
@@ -65,6 +118,7 @@ const FindBusiness = ({ circles, onBusinessesFound }: { circles: Array<{ latitud
             <View style={styles.businessContainer}>
               <Text style={styles.businessName}>{item.name}</Text>
               <Text style={styles.businessStars}>{`Rating: ${item.rating}`}</Text>
+              <Text style={styles.businessTypes}>{`Types: ${item.types.join(', ')}`}</Text>
             </View>
           )}
         />
@@ -93,6 +147,10 @@ const styles = StyleSheet.create({
   businessStars: {
     fontSize: 14,
     color: 'gray',
+  },
+  businessTypes: {
+    fontSize: 12,
+    color: 'blue',
   },
 });
 

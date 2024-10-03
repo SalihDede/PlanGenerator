@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router'; // Import useRouter for routing
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ExploreScreen = () => {
   const [options, setOptions] = useState([
-    { id: 1, name: 'Kafe', active: false },
-    { id: 2, name: 'Yemek', active: false },
-    { id: 3, name: 'Müze', active: false },
+    { id: 1, name: 'Café', active: false },
+    { id: 2, name: 'Food', active: false },
+    { id: 3, name: 'Museum', active: false },
     { id: 4, name: 'Bar', active: false },
-    { id: 5, name: 'Otel', active: false },
-    { id: 6, name: 'Üniversite', active: false },
+    { id: 5, name: 'Hotel', active: false },
+    { id: 6, name: 'University', active: false },
     { id: 7, name: 'Park', active: false },
-    { id: 8, name: 'Sinema', active: false },
-    { id: 9, name: 'Spor Salonu', active: false },
-    { id: 10, name: 'Kütüphane', active: false },
+    { id: 8, name: 'Cinema', active: false },
+    { id: 9, name: 'Gym', active: false },
+    { id: 10, name: 'Library', active: false },
+    { id: 11, name: 'Shopping Mall', active: false },
+    { id: 12, name: 'Pharmacy', active: false },
+    { id: 13, name: 'Gas Station', active: false },
+    { id: 14, name: 'Supermarket', active: false },
+    { id: 15, name: 'Hospital', active: false },
+    { id: 16, name: 'Bank', active: false },
+    { id: 17, name: 'Church', active: false },
+    { id: 18, name: 'Police', active: false },
+    { id: 19, name: 'Post Office', active: false },
+    { id: 20, name: 'Zoo', active: false },
   ]);
 
-  const router = useRouter(); // useRouter for navigation
+  const router = useRouter();
 
   const toggleOption = (id: number) => {
     setOptions(options.map(option =>
@@ -24,25 +35,78 @@ const ExploreScreen = () => {
     ));
   };
 
-  const handleGenerateMap = () => {
-    router.push('/map'); // MapScreen'e yönlendir
+  const handleGenerateMap = async () => {
+    const selectedOptions = options.filter(option => option.active).map(option => option.name);
+    await AsyncStorage.setItem('selectedOptions', JSON.stringify(selectedOptions));
+
+    const startLatString = await AsyncStorage.getItem('startLat');
+    const startLngString = await AsyncStorage.getItem('startLng');
+    const destinationLatString = await AsyncStorage.getItem('destinationLat');
+    const destinationLngString = await AsyncStorage.getItem('destinationLng');
+
+    const startLat = startLatString ? JSON.parse(startLatString) : null;
+    const startLng = startLngString ? JSON.parse(startLngString) : null;
+    const destinationLat = destinationLatString ? JSON.parse(destinationLatString) : null;
+    const destinationLng = destinationLngString ? JSON.parse(destinationLngString) : null;
+
+    if (startLat === null || startLng === null || destinationLat === null || destinationLng === null) {
+      console.error('One or more coordinates are missing!');
+      return;
+    }
+
+    console.log('Selected Options:', selectedOptions);
+
+    router.push({
+      pathname: '/map',
+      params: {
+        startLat,
+        startLng,
+        destinationLat,
+        destinationLng,
+        selectedOptions,
+      },
+    });
   };
 
   return (
     <View style={styles.container}>
-      {options.map(option => (
-        <View key={option.id} style={styles.optionContainer}>
-          <Text style={styles.optionText}>{option.name}</Text>
-          <TouchableOpacity
-            style={[styles.button, option.active ? styles.activeButton : styles.inactiveButton]}
-            onPress={() => toggleOption(option.id)}
-          >
-            <Text style={styles.buttonText}>
-              {option.active ? 'Activate' : 'Deactivate'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        {options.map(option => {
+          const scaleAnim = useRef(new Animated.Value(1)).current;
+
+          const handlePressIn = () => {
+            Animated.spring(scaleAnim, {
+              toValue: 1.1,
+              useNativeDriver: true,
+            }).start();
+          };
+
+          const handlePressOut = () => {
+            Animated.spring(scaleAnim, {
+              toValue: 1,
+              useNativeDriver: true,
+            }).start();
+          };
+
+          return (
+            <View key={option.id} style={styles.optionContainer}>
+              <Text style={styles.optionText}>{option.name}</Text>
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <TouchableOpacity
+                  style={[styles.button, option.active ? styles.activeButton : styles.inactiveButton]}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  onPress={() => toggleOption(option.id)}
+                >
+                  <Text style={styles.buttonText}>
+                    {option.active ? 'Activate' : 'Deactivate'}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          );
+        })}
+      </ScrollView>
       <TouchableOpacity style={styles.generateButton} onPress={handleGenerateMap}>
         <Text style={styles.generateButtonText}>GENERATE MAP</Text>
       </TouchableOpacity>
@@ -56,41 +120,55 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     padding: 20,
   },
+  scrollViewContainer: {
+    paddingBottom: 20,
+  },
   optionContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 15,
   },
   optionText: {
     fontSize: 18,
-    color: '#fff',
+    color: '#FFF',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 15,
+    shadowColor: '#8A2BE2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   activeButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#8A2BE2',
   },
   inactiveButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#555',
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFF',
     fontSize: 16,
   },
   generateButton: {
-    backgroundColor: 'blue',
+    backgroundColor: '#8A2BE2',
     paddingVertical: 15,
-    borderRadius: 5,
+    borderRadius: 25,
     alignItems: 'center',
     marginTop: 30,
+    shadowColor: '#8A2BE2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
   },
   generateButtonText: {
-    color: '#fff',
+    color: '#FFF',
     fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

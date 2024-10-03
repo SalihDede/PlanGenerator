@@ -228,7 +228,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    height: '50%', // Haritanın yüksekliği %50 olarak ayarlandı
+    height: '40%', // Haritanın yüksekliği %40 olarak ayarlandı
+    marginTop: 50,    // Harita etrafında 10 birim boşluk eklendi
   },
   bottomContainer: {
     flex: 1,
@@ -257,9 +258,10 @@ const styles = StyleSheet.create({
   },
   markBusinessButton: {
     marginTop: 5,
-    color: 'blue',
+    color: 'red',
     textDecorationLine: 'underline',
   },
 });
+
 
 export default MapScreen;
