@@ -25,7 +25,7 @@ const ExploreScreen = () => {
   };
 
   const handleGenerateMap = () => {
-    router.push('/map'); // Navigate to the map screen when "GENERATE MAP" is clicked
+    router.push('/map'); // MapScreen'e yönlendir
   };
 
   return (
@@ -38,7 +38,7 @@ const ExploreScreen = () => {
             onPress={() => toggleOption(option.id)}
           >
             <Text style={styles.buttonText}>
-              {option.active ? 'Deactivate' : 'Activate'}
+              {option.active ? 'Activate' : 'Deactivate'}
             </Text>
           </TouchableOpacity>
         </View>

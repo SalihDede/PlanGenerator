@@ -27,41 +27,36 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({ apiKey, onSelectL
           language: 'tr',
         }}
         onPress={(data, details = null) => {
-          if (details) { // details null değilse
-            console.log('Seçilen konum verisi:', data);
-            console.log('Detaylar:', details);
-            onSelectLocation({ 
+          if (details) {
+            const selectedLocation = { 
               description: data.description, 
               place_id: data.place_id, 
               structured_formatting: data.structured_formatting,
-              geometry: details.geometry // details.geometry ekledik
-            });
+              geometry: details.geometry 
+            };
+
+            console.log('Selected Location Data:', selectedLocation);
+            console.log('Data Type:', typeof selectedLocation);
+
+            onSelectLocation(selectedLocation);
             clearError();
-            setResponse(`Seçilen Konum: ${data.description}`);
+            setResponse(`Selected Location: ${data.description}`);
           } else {
-            console.error('Detaylar mevcut değil.');
-            setError('Konum detayları alınamadı.');
+            console.error('No details available.');
+            setError('Could not retrieve location details.');
           }
         }}
         onFail={(error) => {
-          console.error('API isteği başarısız oldu:', error);
-          setError('API isteği başarısız oldu. Lütfen anahtarınızı ve internet bağlantınızı kontrol edin.');
+          console.error('API request failed:', error);
+          setError('API request failed. Please check your key and connection.');
           setResponse(null);
         }}
         onTimeout={() => {
-          console.warn('API isteği zaman aşımına uğradı.');
-          setError('API isteği zaman aşımına uğradı. Lütfen tekrar deneyin.');
+          console.warn('API request timed out.');
+          setError('API request timed out. Please try again.');
           setResponse(null);
         }}
         fetchDetails={true}
-        renderRow={(rowData) => {
-          return (
-            <View style={styles.row}>
-              <Text>{rowData.structured_formatting.main_text}</Text>
-              <Text style={styles.secondary}>{rowData.structured_formatting.secondary_text}</Text>
-            </View>
-          );
-        }}
         debounce={200}
         nearbyPlacesAPI="GooglePlacesSearch"
         enablePoweredByContainer={false}

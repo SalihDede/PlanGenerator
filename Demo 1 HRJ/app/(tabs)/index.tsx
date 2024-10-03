@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import AutoCompleteInput from './AutoCompleteInput'; // Make sure the path is correct
-import { useRouter } from 'expo-router'; // useRouter importu
+import AutoCompleteInput from './AutoCompleteInput';
+import { useRouter } from 'expo-router';
 
 const HitTheRoadScreen = () => {
   const [startLocation, setStartLocation] = useState<any | null>(null);
   const [destinationLocation, setDestinationLocation] = useState<any | null>(null);
-  const router = useRouter(); // useRouter kancasını al
+  const router = useRouter();
 
   const handleStartLocationSelect = (location: any) => {
     console.log('Seçilen Başlangıç Konumu:', location);
@@ -19,24 +19,36 @@ const HitTheRoadScreen = () => {
   };
 
   const handleFilterPlan = () => {
-    console.log('Başlangıç Latitude:', startLocation?.geometry?.location?.lat); // Kontrol et
-    console.log('Başlangıç Longitude:', startLocation?.geometry?.location?.lng); // Kontrol et
-    console.log('Varış Latitude:', destinationLocation?.geometry?.location?.lat); // Kontrol et
-    console.log('Varış Longitude:', destinationLocation?.geometry?.location?.lng); // Kontrol et
+    const startLat = startLocation?.geometry?.location?.lat;
+    const startLng = startLocation?.geometry?.location?.lng;
+    const destinationLat = destinationLocation?.geometry?.location?.lat;
+    const destinationLng = destinationLocation?.geometry?.location?.lng;
 
-    router.push('/map');
+    if (startLat && startLng && destinationLat && destinationLng) {
+      router.push({
+        pathname: '/map',
+        params: {
+          startLat,
+          startLng,
+          destinationLat,
+          destinationLng,
+        },
+      });
+    } else {
+      console.log('Başlangıç veya varış konumu eksik!');
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Hit The Road</Text>
       <AutoCompleteInput
-        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M" // Replace with your API key
+        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M"
         onSelectLocation={handleStartLocationSelect}
         placeholder="Başlangıç"
       />
       <AutoCompleteInput
-        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M" // Replace with your API key
+        apiKey="AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M"
         onSelectLocation={handleDestinationLocationSelect}
         placeholder="Varış"
       />

@@ -12,6 +12,13 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: 'transparent', // Make the tab bar transparent
+          position: 'absolute', // Position it absolutely if needed
+          bottom: 0, // Align it at the bottom
+          left: 0,
+          right: 0,
+        },
       }}>
       <Tabs.Screen
         name="index" // HitTheRoadScreen için
