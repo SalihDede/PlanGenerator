@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const API_KEY = 'AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M'; // Replace with your actual API key
@@ -107,22 +107,9 @@ const optionToTypeMap: { [key: string]: string[] } = {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Selected Businesses for Each Option</Text>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <FlatList
-          data={businesses}
-          keyExtractor={(item) => item.place_id}
-          renderItem={({ item }) => (
-            <View style={styles.businessContainer}>
-              <Text style={styles.businessName}>{item.name}</Text>
-              <Text style={styles.businessStars}>{`Rating: ${item.rating}`}</Text>
-              <Text style={styles.businessTypes}>{`Types: ${item.types.join(', ')}`}</Text>
-            </View>
-          )}
-        />
-      )}
+        <ActivityIndicator size="large" color="black" />
+      ) : null}
     </View>
   );
 };
@@ -130,27 +117,6 @@ const optionToTypeMap: { [key: string]: string[] } = {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  businessContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  businessName: {
-    fontSize: 16,
-  },
-  businessStars: {
-    fontSize: 14,
-    color: 'gray',
-  },
-  businessTypes: {
-    fontSize: 12,
-    color: 'blue',
   },
 });
 
