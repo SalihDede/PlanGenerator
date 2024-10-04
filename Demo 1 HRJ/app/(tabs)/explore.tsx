@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons'; // Icon kütüphanesi
 
 const ExploreScreen = () => {
   const [options, setOptions] = useState([
@@ -70,6 +71,12 @@ const ExploreScreen = () => {
 
   return (
     <View style={styles.container}>
+      {/* Geri butonu */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#FFF" />
+      </TouchableOpacity>
+
+      {/* ScrollView: Seçeneklerin kaydırılabilir alanı */}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {options.map(option => {
           const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -107,6 +114,8 @@ const ExploreScreen = () => {
           );
         })}
       </ScrollView>
+
+      {/* Haritayı oluştur butonu */}
       <TouchableOpacity style={styles.generateButton} onPress={handleGenerateMap}>
         <Text style={styles.generateButtonText}>GENERATE MAP</Text>
       </TouchableOpacity>
@@ -114,13 +123,27 @@ const ExploreScreen = () => {
   );
 };
 
+const { height } = Dimensions.get('window'); // Ekran yüksekliğini al
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-    padding: 20,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40, // Üst kenardan boşluk
+    left: 20, // Sol kenardan boşluk
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10, // ScrollView üzerinde kalması için
   },
   scrollViewContainer: {
+    paddingTop: 80, // Geri butonuyla çakışmaması için üstten boşluk
     paddingBottom: 20,
   },
   optionContainer: {
@@ -138,14 +161,14 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 15,
+    borderRadius: 8,
     shadowColor: '#8A2BE2',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
   },
   activeButton: {
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#6200ea',
   },
   inactiveButton: {
     backgroundColor: '#555',
@@ -155,20 +178,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   generateButton: {
-    backgroundColor: '#8A2BE2',
+    backgroundColor: '#6200ea', // Updated background color
     paddingVertical: 15,
-    borderRadius: 25,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 30,
-    shadowColor: '#8A2BE2',
+    shadowColor: '#6200ea',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
   },
   generateButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#fff', // Updated text color to white
+    fontSize: 16,  // Updated font size to 16
+    fontWeight: 'bold', // Updated font weight to bold
   },
 });
 

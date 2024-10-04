@@ -13,15 +13,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: 'transparent', // Make the tab bar transparent
-          position: 'absolute', // Position it absolutely if needed
-          bottom: 0, // Align it at the bottom
-          left: 0,
-          right: 0,
+          display: 'none', // Tab barı görünmez yap
         },
       }}>
       <Tabs.Screen
-        name="index" // HitTheRoadScreen için
+        name="index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
@@ -30,7 +26,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore" // ExploreScreen için
+        name="explore"
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (

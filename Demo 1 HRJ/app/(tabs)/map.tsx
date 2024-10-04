@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Button, Alert, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert, Text, FlatList, TouchableOpacity } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
-import { useLocalSearchParams } from 'expo-router';
-import { Picker } from '@react-native-picker/picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import FindBusiness from './findBusiness';
 import DefineArea, { CircleData } from './defineArea';
+import { Picker } from '@react-native-picker/picker';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 const MapScreen = () => {
+  const navigation = useNavigation(); // Get the navigation prop
   const { startLat, startLng, destinationLat, destinationLng } = useLocalSearchParams();
 
   const startLatitude = Array.isArray(startLat) ? startLat[0] : startLat || '';
@@ -43,7 +46,6 @@ const MapScreen = () => {
       return;
     }
 
-    // Önceki verileri temizle
     setDirections([]);
     setBusinesses([]);
     setMarkedBusinesses([]);
@@ -136,22 +138,26 @@ const MapScreen = () => {
   };
 
   const handleMarkBusiness = (business: any) => {
-    // İşaretlenen işletmeyi listeden kaldırma
     const updatedBusinesses = businesses.filter((item) => item.place_id !== business.place_id);
     setBusinesses(updatedBusinesses);
     setMarkedBusinesses([...markedBusinesses, business]);
   };
-
+  const router = useRouter();
   return (
     <View style={styles.container}>
+      {/* Back button at the top left corner */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push("/explore")}>
+        <Ionicons name="arrow-back" size={24} color="#FFF" />
+      </TouchableOpacity>
+
       <MapView
         ref={mapRef}
         style={styles.map}
         initialRegion={{
           latitude: parseFloat(startLatitude) || 37.78825,
           longitude: parseFloat(startLongitude) || -122.4324,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
         }}
       >
         {startLatitude && startLongitude && (
@@ -164,11 +170,11 @@ const MapScreen = () => {
         {destinationLatitude && destinationLongitude && (
           <Marker
             coordinate={{ latitude: parseFloat(destinationLatitude), longitude: parseFloat(destinationLongitude) }}
-            pinColor="green"
+            pinColor="blue"
             title="Destination"
           />
         )}
-        {directions.length > 0 && <Polyline coordinates={directions} strokeWidth={6} strokeColor="#000" />}
+        {directions.length > 0 && <Polyline coordinates={directions} strokeWidth={4} strokeColor="#4285F4" />}
         <DefineArea
           coordinates={directions}
           startLatitude={parseFloat(startLatitude)}
@@ -186,12 +192,27 @@ const MapScreen = () => {
           />
         ))}
       </MapView>
-      {/* İşletmeleri haritanın altına taşıdık */}
+
+      {/* Independent white box */}
+      <View style={[styles.independentBox, { padding: 0, height: 50, width: 160 }]}>
+        <Picker
+          selectedValue={transportMode}
+          onValueChange={(itemValue) => setTransportMode(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Transport Type" value="" enabled={false} />
+          <Picker.Item label="Driving" value="driving" />
+          <Picker.Item label="Walking" value="walking" />
+          <Picker.Item label="Transit" value="transit" />
+        </Picker>
+      </View>
+
       {businesses.length > 0 && (
         <FlatList
           data={businesses}
           keyExtractor={(item) => item.place_id}
-          horizontal={true} // Yatay liste
+          horizontal={true}
+          style={styles.flatList}
           renderItem={({ item }) => (
             <View style={styles.businessContainer}>
               <Text style={styles.businessName}>{item.name}</Text>
@@ -204,19 +225,9 @@ const MapScreen = () => {
         />
       )}
       <View style={styles.bottomContainer}>
-        <View style={styles.transportModeContainer}>
-          <Picker
-            selectedValue={transportMode}
-            onValueChange={(itemValue) => setTransportMode(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Driving" value="driving" />
-            <Picker.Item label="Walking" value="walking" />
-            <Picker.Item label="Bicycling" value="bicycling" />
-            <Picker.Item label="Transit" value="transit" />
-          </Picker>
-        </View>
-        <Button title="Get Directions" onPress={getDirections} />
+        <TouchableOpacity style={styles.button} onPress={getDirections}>
+          <Text style={styles.buttonText}>Get Directions</Text>
+        </TouchableOpacity>
         <FindBusiness circles={circleData} onBusinessesFound={handleBusinessesFound} />
       </View>
     </View>
@@ -228,26 +239,62 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    height: '40%', // Haritanın yüksekliği %40 olarak ayarlandı
-    marginTop: 50,    // Harita etrafında 10 birim boşluk eklendi
-  },
-  bottomContainer: {
     flex: 1,
-    padding: 10,
   },
-  transportModeContainer: {
-    marginBottom: 10,
+  independentBox: {
+    position: 'absolute',
+    bottom: 168, // Adjust position as needed
+    left: 5, // Adjust position as needed
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    zIndex: 1, // Ensure it stays on top of other components
   },
   picker: {
     height: 50,
-    width: 150,
+    width: '100%',
+  },
+  
+  boxText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  bottomContainer: {
+    position: 'absolute',
+    bottom: 10,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  flatList: {
+    position: 'absolute',
+    bottom: 70,
+    left: 0,
+    right: 0,
+    height: 100,
+  },
+  button: {
+    width: '90%',
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   businessContainer: {
-    marginBottom: 10,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
     padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    width: 200,
+    margin: 5,
+    elevation: 2,
   },
   businessName: {
     fontSize: 16,
@@ -257,11 +304,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   markBusinessButton: {
-    marginTop: 5,
-    color: 'red',
-    textDecorationLine: 'underline',
+    color: 'blue',
+    fontSize: 14,
+  },
+  backButton: {
+    position: 'absolute',
+    marginTop: 15,
+    top: 10,
+    left: 10,
+    zIndex: 2, // Ensure it stays above the map
   },
 });
-
 
 export default MapScreen;
