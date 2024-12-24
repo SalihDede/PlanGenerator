@@ -1,2 +1,1 @@
-# PlanGenerator
-Generate optimal road for daily usage.
+Akıllı Rota Planlayıcı, TypeScript ile geliştirilmiş ve Google API altyapısını kullanan yenilikçi bir mobil uygulamadır. Kullanıcıların başlangıç ve varış noktalarını belirleyerek günlerini en verimli şekilde planlamalarına olanak tanır. Google Haritalar’ın durak ekleme özelliğinden ilham alınarak tasarlanan bu uygulama, rotayı değiştirmeden günlük ihtiyaçları minimum zaman ve enerji kaybıyla karşılayacak şekilde optimize eder. "Rastgele Gün Yarat" özelliği sayesinde kararsız anlarda spontane planlar oluşturabilir, günlük rutininizi eğlenceli hale getirebilirsiniz. Enerji ve zaman tasarrufu sunan bu uygulama, modern yaşamın hızına ayak uydurmak isteyenler için ideal bir yol arkadaşıdır.
