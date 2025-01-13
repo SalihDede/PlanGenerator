@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
-const API_KEY = 'AIzaSyAd6QPsDb0lvL7G37GP9Yp-4kDNgiUS7-M'; // Replace with your actual API key
+const API_KEY = ''; // Replace with your actual API key
 
 const FindBusiness = ({ circles, onBusinessesFound }: { circles: Array<{ latitude: number, longitude: number, radius: number }>, onBusinessesFound: (businesses: any[]) => void }) => {
   const [businesses, setBusinesses] = useState<any[]>([]);
